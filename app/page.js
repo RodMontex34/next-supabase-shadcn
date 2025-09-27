@@ -1,14 +1,14 @@
-'use client'
+"use client";
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import TablaUsuarios from '@/components/TablaUsuarios';
 import FormularioUsuario from '@/components/FormularioUsuario';
 import DialogoConfirmacion from '@/components/DialogoConfirmacion';
+import { NavigationBar } from '@/components/NavigationBar';
 import {
   obtenerUsuarios, crearUsuario, actualizarUsuario, eliminarUsuario
 } from '@/lib/usuarios';
-
 
 export default function HomePage() {
   const [usuarios, setUsuarios] = useState([])
@@ -19,7 +19,6 @@ export default function HomePage() {
   const [modalConfirmacion, setModalConfirmacion] = useState(false)
   const [usuarioEditando, setUsuarioEditando] = useState(null)
   const [usuarioEliminando, setUsuarioEliminando] = useState(null)
-
 
   // Cargar usuarios al montar el componente 
   useEffect(() => {
@@ -101,31 +100,52 @@ export default function HomePage() {
 
   }
   return (
-    <main className="container mx-auto py-8 px-4">
-      <div className="space-y-6"> <div className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight"> Gestión de Usuarios
-        </h1>
-        <p className="text-muted-foreground">
-          Sistema CRUD con Next.js 15, Supabase y shadcn/ui </p>
+    <main className="min-h-screen w-full bg-gradient-to-br from-blue-100 via-white to-purple-100 flex flex-col items-center justify-start">
+      <div className="w-full max-w-4xl mx-auto">
+        <NavigationBar />
       </div>
-        <TablaUsuarios usuarios={usuarios} onNew={handleNuevoUsuario} onEdit={handleEditarUsuario} onDelete={handleEliminarUsuario} isLoading={isLoading} />
+      <div className="w-full max-w-4xl mt-20 p-8 rounded-2xl shadow-2xl bg-white/80 backdrop-blur-lg animate-fade-in flex flex-col items-center">
+        <div className="text-center mb-12 w-full flex flex-col items-center justify-center">
+          <h1 className="text-4xl font-extrabold tracking-tight text-blue-700 drop-shadow-lg mb-2">Gestión de Usuarios</h1>
+          <p className="text-lg text-gray-500 mt-2 max-w-xl mx-auto">Sistema CRUD con Next.js 15, Supabase y shadcn/ui</p>
+        </div>
+        <div className="w-full">
+          <TablaUsuarios usuarios={usuarios} onNew={handleNuevoUsuario} onEdit={handleEditarUsuario} onDelete={handleEliminarUsuario} isLoading={isLoading} />
+        </div>
       </div>
-      {/* Modal de formulario */}
       <Dialog open={modalFormulario} onOpenChange={cerrarModalFormulario}>
-
-        <DialogContent className="sm:max-w-md"> <DialogHeader>
-          <DialogTitle>
-            {usuarioEditando ? 'Editar Usuario' : 'Nuevo Usuario'}
-          </DialogTitle> </DialogHeader> <FormularioUsuario
-            usuario={usuarioEditando} onSubmit={handleSubmitFormulario} onCancel={cerrarModalFormulario} isLoading={isSubmitting} /> </DialogContent>
+        <DialogContent className="rounded-xl shadow-xl bg-white/90">
+          <DialogHeader>
+            <DialogTitle className="text-blue-700 font-bold text-2xl">{usuarioEditando ? 'Editar Usuario' : 'Nuevo Usuario'}</DialogTitle>
+          </DialogHeader>
+          <FormularioUsuario
+            usuario={usuarioEditando}
+            onSubmit={handleSubmitFormulario}
+            isSubmitting={isSubmitting}
+            onCancel={cerrarModalFormulario}
+          />
+        </DialogContent>
       </Dialog>
-      {/* Modal de confirmación para eliminar */}
       <DialogoConfirmacion
-        open={modalConfirmacion} onOpenChange={setModalConfirmacion} onConfirm={handleConfirmarEliminacion} title="Eliminar Usuario"
-        description={usuarioEliminando
-          ? `¿Estás seguro de que deseas eliminar a "${usuarioEliminando.nombre}"? Esta acción no se puede deshacer.`
-          : ''}
-        confirmText="Eliminar" cancelText="Cancelar" isDestructive={true} isLoading={isSubmitting}
-      /> </main>
+        open={modalConfirmacion}
+        onOpenChange={cerrarModalConfirmacion}
+        onConfirm={handleConfirmarEliminacion}
+        title="Eliminar Usuario"
+        description={usuarioEliminando ? `¿Estás seguro de que deseas eliminar a "${usuarioEliminando.nombre}"? Esta acción no se puede deshacer.` : ''}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        isDestructive={true}
+        isLoading={isSubmitting}
+      />
+      <style jsx global>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.8s ease;
+        }
+      `}</style>
+    </main>
   )
 }
